@@ -11,3 +11,15 @@ dev:
 	terraform -chdir=terraform init -backend-config=backend.conf
 	terraform -chdir=terraform validate
 	terraform -chdir=terraform apply -var env=dev
+
+init:
+	terraform -chdir=terraform init -backend-config=backend.conf
+
+deploy:
+	terraform -chdir=terraform apply -var env=$(env) -var stack-name=$(stack)
+
+destroy:
+	terraform -chdir=terraform destroy -var env=$(env) -var stack-name=$(stack)
+
+output:
+	terraform -chdir=terraform output > outputs
