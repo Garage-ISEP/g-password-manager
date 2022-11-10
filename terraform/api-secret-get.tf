@@ -57,7 +57,7 @@ resource "aws_lambda_function" "secrets-get-lambda" {
 
   environment {
     variables = {
-      HELLO = "WORLD"
+      DYNAMO_TABLE = aws_dynamodb_table.table.name
     }
   }
 
