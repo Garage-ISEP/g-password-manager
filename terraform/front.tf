@@ -68,7 +68,7 @@ data "aws_iam_policy_document" "front" {
 
 module "template-files" {
   source   = "hashicorp/dir/template"
-  base_dir = "${path.module}/../front"
+  base_dir = "${path.module}/../app/dist"
 }
 
 
