@@ -16,10 +16,10 @@ init:
 	terraform -chdir=terraform init -backend-config=backend.conf
 
 deploy:
-	terraform -chdir=terraform apply -var env=$(env) -var stack-name=$(stack)
+	terraform -chdir=terraform apply -var env=$(env)
 
 destroy:
-	terraform -chdir=terraform destroy -var env=$(env) -var stack-name=$(stack)
+	terraform -chdir=terraform destroy -var env=$(env)
 
 output:
 	terraform -chdir=terraform output > outputs
