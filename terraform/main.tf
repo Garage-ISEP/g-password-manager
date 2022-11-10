@@ -13,7 +13,6 @@ terraform {
 }
 
 provider "aws" {
-  profile = "garage"
   region  = "eu-west-3"
 }
 
