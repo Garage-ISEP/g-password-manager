@@ -25,5 +25,3 @@ locals {
     environement = var.env
   }
 }
-
-
