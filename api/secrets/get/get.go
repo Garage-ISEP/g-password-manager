@@ -2,17 +2,26 @@ package main
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
-type MyEvent struct {
-	Name string `json:"name"`
-}
+func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) ([]*string, error) {
 
-func HandleRequest(ctx context.Context, name MyEvent) (string, error) {
-	return fmt.Sprintf("Hello GET %s!", name.Name), nil
+	session := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+
+	// Create DynamoDB client
+	svc := dynamodb.New(session)
+	tables, err := svc.ListTables(&dynamodb.ListTablesInput{})
+	if err != nil {
+		return nil, err
+	}
+	return tables.TableNames, nil
 }
 
 func main() {
