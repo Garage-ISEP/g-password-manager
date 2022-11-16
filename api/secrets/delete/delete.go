@@ -2,19 +2,19 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"garage-vault/api/utils"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type MyEvent struct {
-	Name string `json:"name"`
-}
-
-func HandleRequest(ctx context.Context, name MyEvent) (string, error) {
-	return fmt.Sprintf("Hello DELETE %s!", name.Name), nil
+func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (interface{}, error) {
+	return nil, nil
 }
 
 func main() {
-	lambda.Start(HandleRequest)
+	lambda.Start(func(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+		res := utils.HandleAWSProxy(HandleRequest, ctx, request)
+		return res, nil
+	})
 }

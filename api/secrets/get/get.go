@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"garage-vault/api/utils"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -9,21 +11,27 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
-func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) ([]*string, error) {
+func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (interface{}, error) {
 
 	session := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
+	table := os.Getenv("DYNAMO_TABLE")
 	// Create DynamoDB client
 	svc := dynamodb.New(session)
-	tables, err := svc.ListTables(&dynamodb.ListTablesInput{})
+	items, err := svc.Scan(&dynamodb.ScanInput{
+		TableName: &table,
+	})
 	if err != nil {
 		return nil, err
 	}
-	return tables.TableNames, nil
+	return items, nil
 }
 
 func main() {
-	lambda.Start(HandleRequest)
+	lambda.Start(func(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+		res := utils.HandleAWSProxy(HandleRequest, ctx, request)
+		return res, nil
+	})
 }
