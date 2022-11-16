@@ -38,9 +38,9 @@ resource "aws_lambda_permission" "secrets-put-permission" {
 
 data "archive_file" "lambda-zip-put" {
   type             = "zip"
-  source_dir       = "${path.module}/../api/secrets/put"
+	source_file = "${path.module}/../dist/secrets/put/put"
   output_file_mode = "0666"
-  output_path      = "${path.module}/archives/secrets-put.zip"
+  output_path      = "${path.module}/../dist/archives/secrets-put.zip"
 }
 
 resource "aws_lambda_function" "secrets-put-lambda" {

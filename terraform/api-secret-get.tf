@@ -38,9 +38,9 @@ resource "aws_lambda_permission" "secrets-get-permission" {
 
 data "archive_file" "lambda-zip-get" {
   type             = "zip"
-  source_dir       = "${path.module}/../api/secrets/get"
+	source_file = "${path.module}/../dist/secrets/get/get"
   output_file_mode = "0666"
-  output_path      = "${path.module}/archives/secrets-get.zip"
+  output_path      = "${path.module}/../dist/archives/secrets-get.zip"
 }
 
 resource "aws_lambda_function" "secrets-get-lambda" {

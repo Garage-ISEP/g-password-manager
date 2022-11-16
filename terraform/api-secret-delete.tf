@@ -38,9 +38,9 @@ resource "aws_lambda_permission" "secrets-delete-permission" {
 
 data "archive_file" "lambda-zip-delete" {
   type             = "zip"
-  source_dir       = "${path.module}/../api/secrets/delete"
+	source_file = "${path.module}/../dist/secrets/delete/delete"
   output_file_mode = "0666"
-  output_path      = "${path.module}/archives/secrets-delete.zip"
+  output_path      = "${path.module}/../dist/archives/secrets-delete.zip"
 }
 
 resource "aws_lambda_function" "secrets-delete-lambda" {

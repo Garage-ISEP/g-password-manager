@@ -34,9 +34,6 @@ resource "aws_api_gateway_deployment" "api" {
     redeployment = sha1(jsonencode([
       aws_api_gateway_resource.secrets.id,
       aws_api_gateway_resource.context-ids.id,
-      filebase64sha256(data.archive_file.lambda-zip-get.output_path),
-      filebase64sha256(data.archive_file.lambda-zip-put.output_path),
-      filebase64sha256(data.archive_file.lambda-zip-delete.output_path)
     ]))
   }
 

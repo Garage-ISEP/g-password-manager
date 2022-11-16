@@ -4,7 +4,7 @@ write-conf:
 	cd terraform; sed -i 's/ENV/$(env)/g' backend.conf
 	cd terraform; sed -i 's/STACK/$(stack)/g' backend.conf
 
-dev:
+dev: build
 	cd terraform; cp backend-default.conf backend.conf
 	cd terraform; sed -i 's/ENV/dev/g' backend.conf
 	cd terraform; sed -i 's/STACK/g-password-manager/g' backend.conf
@@ -23,3 +23,9 @@ destroy:
 
 output:
 	terraform -chdir=terraform output > outputs
+
+build:
+	cd api; make build
+
+clean:
+	rm -rf dist/*

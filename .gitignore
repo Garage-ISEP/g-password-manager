@@ -36,3 +36,5 @@ override.tf.json
 **/archives
 *.zip
 outputs
+
+dist

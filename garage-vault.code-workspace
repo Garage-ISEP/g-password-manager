@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "terraform"
+		},
+		{
+			"path": "dist"
 		}
 	],
 	"settings": {}
