@@ -18,9 +18,9 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}))
 
 	table := os.Getenv("DYNAMO_TABLE")
-	// Create DynamoDB client
-	svc := dynamodb.New(session)
-	items, err := svc.Scan(&dynamodb.ScanInput{
+	// Create DynamoDB db
+	db := dynamodb.New(session)
+	items, err := db.Query(&dynamodb.QueryInput{
 		TableName: &table,
 	})
 	if err != nil {
