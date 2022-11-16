@@ -26,6 +26,7 @@ output:
 
 build:
 	cd api; make build
+	cd app; make build
 
 clean:
 	rm -rf dist/*
