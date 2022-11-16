@@ -33,12 +33,12 @@ resource "aws_lambda_permission" "context-ids-get-permission" {
   function_name = aws_lambda_function.context-ids-get-lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "arn:aws:execute-api:ap-southeast-2:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api.id}/*/${aws_api_gateway_method.context-ids-get.http_method}${aws_api_gateway_resource.context-ids.path}"
+  source_arn = "arn:aws:execute-api:eu-west-3:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api.id}/*/${aws_api_gateway_method.context-ids-get.http_method}${aws_api_gateway_resource.context-ids.path}"
 }
 
 data "archive_file" "lambda-zip-context-ids-get" {
   type             = "zip"
-	source_file = "${path.module}/../dist/context-ids/get/get"
+  source_file      = "${path.module}/../dist/context-ids/get/get"
   output_file_mode = "0666"
   output_path      = "${path.module}/../dist/archives/context-ids-get.zip"
 }

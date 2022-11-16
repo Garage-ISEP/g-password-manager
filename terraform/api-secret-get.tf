@@ -33,12 +33,12 @@ resource "aws_lambda_permission" "secrets-get-permission" {
   function_name = aws_lambda_function.secrets-get-lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "arn:aws:execute-api:ap-southeast-2:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api.id}/*/${aws_api_gateway_method.secrets-get.http_method}${aws_api_gateway_resource.secrets.path}"
+  source_arn = "arn:aws:execute-api:eu-west-3:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api.id}/*/${aws_api_gateway_method.secrets-get.http_method}${aws_api_gateway_resource.secrets.path}"
 }
 
 data "archive_file" "lambda-zip-get" {
   type             = "zip"
-	source_file = "${path.module}/../dist/secrets/get/get"
+  source_file      = "${path.module}/../dist/secrets/get/get"
   output_file_mode = "0666"
   output_path      = "${path.module}/../dist/archives/secrets-get.zip"
 }
