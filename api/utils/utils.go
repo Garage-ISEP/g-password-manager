@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/mitchellh/mapstructure"
 )
 
 type Handler func(ctx context.Context, request events.APIGatewayProxyRequest) (interface{}, error)
@@ -22,6 +23,7 @@ func HandleAWSProxy(handler Handler, ctx context.Context, request events.APIGate
 	}()
 
 	res, err := handler(ctx, request)
+	fmt.Println("Handler executed")
 	if err != nil {
 		if httpError, ok := err.(HttpError); ok {
 			return httpError.ToResponse()
@@ -32,7 +34,10 @@ func HandleAWSProxy(handler Handler, ctx context.Context, request events.APIGate
 
 	var data []byte
 	if res != nil {
-		data, _ = json.Marshal(res)
+		data, err = json.Marshal(res)
+		if err != nil {
+			return NewInternalServerError(err).ToResponse()
+		}
 	}
 
 	return &events.APIGatewayProxyResponse{
@@ -45,6 +50,18 @@ func ValidateBody(body string, object interface{}) error {
 	if err := json.Unmarshal([]byte(body), object); err != nil {
 		return NewBadRequestError(fmt.Errorf("Error unmarshalling body: %s", err.Error()))
 	}
+	return validateObject(object)
+}
+
+// Parse a param map into a struct
+func ValidateQueryParams(params *map[string]string, object interface{}) error {
+	if err := mapstructure.Decode(params, object); err != nil {
+		return NewBadRequestError(fmt.Errorf("Error umarshalling query params: %s", err.Error()))
+	}
+	return validateObject(object)
+}
+
+func validateObject(object interface{}) error {
 	// Iterate over all object fields to get tags
 	t := reflect.TypeOf(object).Elem()
 	v := reflect.ValueOf(object).Elem()
