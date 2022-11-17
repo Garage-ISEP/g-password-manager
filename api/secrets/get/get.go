@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"garage-vault/api/models"
 	"garage-vault/api/utils"
 	"os"
@@ -14,17 +15,17 @@ import (
 )
 
 type Request struct {
-	Query string `json:"query"`
-	From  string `json:"from"`
+	Query string
+	From  string
 }
 
 type Response struct {
 	Items *[]models.SecretEntry `json:"items"`
-	Query string                `json:"query"`
-	From  string                `json:"from"`
-	To    string                `json:"to"`
-	Total int64                 `json:"total"`
-	Count int64                 `json:"count"`
+	Query *string               `json:"query"`
+	From  *string               `json:"from"`
+	To    *string               `json:"to"`
+	Total *int64                `json:"total"`
+	Count *int64                `json:"count"`
 }
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (interface{}, error) {
@@ -33,48 +34,63 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	queryParams := Request{
-		Query: request.QueryStringParameters["query"],
-		From:  request.QueryStringParameters["from"],
-	}
-	if queryParams.Query == "" {
-		queryParams.Query = ".*"
+	var queryParams Request
+	if err := utils.ValidateQueryParams(&request.QueryStringParameters, &queryParams); err != nil {
+		return nil, err
 	}
 
 	table := os.Getenv("DYNAMO_TABLE")
 	// Create DynamoDB db
 	db := dynamodb.New(session)
 
-	queryRes, err := db.Query(&dynamodb.QueryInput{
-		TableName:              &table,
+	queryInput := &dynamodb.QueryInput{
+		TableName:              aws.String(table),
 		Limit:                  aws.Int64(50),
-		KeyConditionExpression: aws.String("contains(sk, :query"),
-		ExclusiveStartKey: map[string]*dynamodb.AttributeValue{
+		KeyConditionExpression: aws.String("pk = :pk"),
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":pk": {
+				S: aws.String(models.PK_SECRET),
+			},
+		},
+	}
+	// Handle from query offset
+	if queryParams.From != "" {
+		queryInput.SetExclusiveStartKey(map[string]*dynamodb.AttributeValue{
 			"sk": {
 				S: aws.String(queryParams.From),
 			},
-		},
-		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
-			":query": {
-				S: aws.String(queryParams.Query),
-			},
-		},
-	})
+		})
+	}
+	// Handler query string to search for a specific secret
+	if queryParams.Query != "" {
+		queryInput.SetFilterExpression("contains(#name, :query)")
+		queryInput.ExpressionAttributeValues[":query"] = &dynamodb.AttributeValue{
+			S: aws.String(queryParams.Query),
+		}
+	}
+	// Execute query
+	queryRes, err := db.Query(queryInput)
 	if err != nil {
+		fmt.Println("error")
 		return nil, err
 	}
 
-	var items *[]models.SecretEntry
-	if err := dynamodbattribute.UnmarshalListOfMaps(queryRes.Items, items); err != nil {
+	// Parse response
+	var items []models.SecretEntry = make([]models.SecretEntry, 0)
+	if err := dynamodbattribute.UnmarshalListOfMaps(queryRes.Items, &items); err != nil {
 		return nil, err
 	}
 
+	var to *string
+	if queryRes.LastEvaluatedKey != nil {
+		to = queryRes.LastEvaluatedKey["sk"].S
+	}
 	return &Response{
-		Items: items,
-		Count: *queryRes.Count,
-		Total: *queryRes.ScannedCount,
-		From:  queryParams.From,
-		To:    *queryRes.LastEvaluatedKey["sk"].S,
+		Items: &items,
+		Count: queryRes.Count,
+		Total: queryRes.ScannedCount,
+		From:  &queryParams.From,
+		To:    to,
 	}, nil
 }
 
