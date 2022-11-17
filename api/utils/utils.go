@@ -43,8 +43,7 @@ func HandleAWSProxy(handler Handler, ctx context.Context, request events.APIGate
 
 func ValidateBody(body string, object interface{}) error {
 	if err := json.Unmarshal([]byte(body), object); err != nil {
-		fmt.Printf("Error unmarshalling body: %v", err)
-		return NewInternalServerError(fmt.Errorf("Error unmarshalling body"))
+		return NewBadRequestError(fmt.Errorf("Error unmarshalling body: %s", err.Error()))
 	}
 	// Iterate over all object fields to get tags
 	t := reflect.TypeOf(object).Elem()
