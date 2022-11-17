@@ -23,7 +23,7 @@ func HandleAWSProxy(handler Handler, ctx context.Context, request events.APIGate
 
 	res, err := handler(ctx, request)
 	if err != nil {
-		if httpError, ok := err.(*HttpError); ok {
+		if httpError, ok := err.(HttpError); ok {
 			return httpError.ToResponse()
 		} else {
 			return NewInternalServerError(err).ToResponse()
@@ -55,7 +55,7 @@ func ValidateBody(body string, object interface{}) error {
 		if field.Tag.Get("required") == "true" {
 			// Check if field is empty
 			if v.Field(i).IsZero() {
-				return NewBadRequestError(fmt.Errorf("field %s is required", field.Name))
+				return NewBadRequestError(fmt.Errorf("field %s is required", field.Tag.Get("json")))
 			}
 		}
 	}
