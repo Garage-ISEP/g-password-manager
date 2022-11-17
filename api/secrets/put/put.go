@@ -2,25 +2,16 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
+	"garage-vault/api/models"
 	"garage-vault/api/utils"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
-
-type RequestBody struct {
-	Name        string `json:"name"`
-	Secret      string `json:"secret"`
-	Email       string `json:"email"`
-	Username    string `json:"username"`
-	Group       string `json:"group"`
-	Description string `json:"description"`
-}
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (interface{}, error) {
 
@@ -28,16 +19,19 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	var body RequestBody
-	err := json.Unmarshal([]byte(request.Body), &body)
-	if err != nil {
+	// Prepare the item to be added
+	var body models.SecretEntry
+	if err := utils.ValidateBody(request.Body, &body); err != nil {
 		return nil, err
 	}
+	body.Pk = "pk_secret"
 
+	// Put item in DynamoDB
 	table := os.Getenv("DYNAMO_TABLE")
 
 	db := dynamodb.New(session)
-	item, err := dynamodbattribute.MarshalMap(&request)
+	item, err := dynamodbattribute.MarshalMap(&body)
+	fmt.Printf("inserting item %v\n", item)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +48,5 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 }
 
 func main() {
-	lambda.Start(func(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-		res := utils.HandleAWSProxy(HandleRequest, ctx, request)
-		return res, nil
-	})
+	utils.LambdaStart(HandleRequest)
 }
