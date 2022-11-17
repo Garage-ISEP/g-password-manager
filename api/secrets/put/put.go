@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"garage-vault/api/models"
 	"garage-vault/api/utils"
 	"os"
@@ -31,7 +30,6 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	db := dynamodb.New(session)
 	item, err := dynamodbattribute.MarshalMap(&body)
-	fmt.Printf("inserting item %v\n", item)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +42,11 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 
-	return item, nil
+	var output models.SecretEntry
+	if err := dynamodbattribute.UnmarshalMap(item, &output); err != nil {
+		return nil, err
+	}
+	return output, nil
 }
 
 func main() {
