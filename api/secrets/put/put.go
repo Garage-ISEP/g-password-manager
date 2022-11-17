@@ -5,6 +5,7 @@ import (
 	"garage-vault/api/models"
 	"garage-vault/api/utils"
 	"os"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -24,6 +25,12 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 	body.Pk = "pk_secret"
+	// body.CreatedById = request.RequestContext.Authorizer["principalId"].(string)
+	// body.CreatedByName = request.RequestContext.Authorizer["name"].(string)
+	body.CreatedAt = time.Now().Format(time.RFC3339)
+	body.UpdatedAt = body.CreatedAt
+	// body.UpdatedById = body.CreatedById
+	// body.UpdatedByName = body.CreatedByName
 
 	// Put item in DynamoDB
 	table := os.Getenv("DYNAMO_TABLE")
