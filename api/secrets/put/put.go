@@ -24,7 +24,8 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	if err := utils.ValidateBody(request.Body, &body); err != nil {
 		return nil, err
 	}
-	body.Pk = "pk_secret"
+	body.Pk = models.PK_SECRET
+	body.Sk = body.Group + "#" + body.Name
 	// body.CreatedById = request.RequestContext.Authorizer["principalId"].(string)
 	// body.CreatedByName = request.RequestContext.Authorizer["name"].(string)
 	body.CreatedAt = time.Now().Format(time.RFC3339)
