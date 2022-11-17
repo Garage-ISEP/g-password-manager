@@ -1,8 +1,14 @@
 package models
 
+const (
+	PK_SECRET = "pk_secret"
+	PK_GROUP  = "pk_group"
+)
+
 type SecretEntry struct {
 	Pk            string `json:"pk"`
-	Sk            string `json:"sk" required:"true"`
+	Sk            string `json:"sk"`
+	Name          string `json:"name" required:"true"`
 	Secret        string `json:"secret" required:"true"`
 	Url           string `json:"url"`
 	Email         string `json:"email"`
