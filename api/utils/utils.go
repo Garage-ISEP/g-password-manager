@@ -13,6 +13,7 @@ import (
 
 type Handler func(ctx context.Context, request events.APIGatewayProxyRequest) (interface{}, error)
 
+// Handle the request, catch all panics and parse response to json with AWS ApiGatewayProxyResponse
 func HandleAWSProxy(handler Handler, ctx context.Context, request events.APIGatewayProxyRequest) *events.APIGatewayProxyResponse {
 
 	// Recover from panic

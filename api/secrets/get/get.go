@@ -15,8 +15,8 @@ import (
 )
 
 type Request struct {
-	Query string
-	From  string
+	Query *string
+	From  *string
 }
 
 type Response struct {
@@ -46,26 +46,29 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	queryInput := &dynamodb.QueryInput{
 		TableName:              aws.String(table),
 		Limit:                  aws.Int64(50),
-		KeyConditionExpression: aws.String("pk = :pk"),
+		KeyConditionExpression: aws.String("pk = :pk AND begins_with(sk, :sk)"),
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":pk": {
 				S: aws.String(models.PK_SECRET),
 			},
+			":sk": {
+				S: aws.String("DSI#"), //TODO: ADD dynamic group
+			},
 		},
 	}
 	// Handle from query offset
-	if queryParams.From != "" {
+	if queryParams.From != nil {
 		queryInput.SetExclusiveStartKey(map[string]*dynamodb.AttributeValue{
 			"sk": {
-				S: aws.String(queryParams.From),
+				S: queryParams.From,
 			},
 		})
 	}
 	// Handler query string to search for a specific secret
-	if queryParams.Query != "" {
+	if queryParams.Query != nil {
 		queryInput.SetFilterExpression("contains(#name, :query)")
 		queryInput.ExpressionAttributeValues[":query"] = &dynamodb.AttributeValue{
-			S: aws.String(queryParams.Query),
+			S: queryParams.Query,
 		}
 	}
 	// Execute query
@@ -89,7 +92,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		Items: &items,
 		Count: queryRes.Count,
 		Total: queryRes.ScannedCount,
-		From:  &queryParams.From,
+		From:  queryParams.From,
 		To:    to,
 	}, nil
 }

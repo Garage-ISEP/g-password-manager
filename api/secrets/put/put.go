@@ -25,7 +25,10 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 	body.Pk = models.PK_SECRET
-	body.Sk = body.Group + "#" + body.Name
+
+	// TODO: Remove # from body.Group & Remove # from body.Name
+
+	body.Sk = body.Group + "#" + "4566713-6713136-18393"
 	// body.CreatedById = request.RequestContext.Authorizer["principalId"].(string)
 	// body.CreatedByName = request.RequestContext.Authorizer["name"].(string)
 	body.CreatedAt = time.Now().Format(time.RFC3339)

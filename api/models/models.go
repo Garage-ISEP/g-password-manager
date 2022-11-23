@@ -5,16 +5,19 @@ const (
 	PK_GROUP  = "pk_group"
 )
 
-type SecretEntry struct {
-	Pk            string `json:"pk"`
-	Sk            string `json:"sk"`
-	Name          string `json:"name" required:"true"`
-	Secret        string `json:"secret" required:"true"`
-	Url           string `json:"url"`
-	Email         string `json:"email"`
-	Username      string `json:"username"`
-	Group         string `json:"group" required:"true"`
-	Description   string `json:"description"`
+type Secret struct {
+	Pk            string   `json:"pk"`
+	Sk            string   `json:"sk"`
+	Name          string   `json:"name" required:"true"`
+	Url           string   `json:"url"`
+	Email         string   `json:"email"`
+	Username      string   `json:"username"`
+	WritingGroups []string `json:"writingGroups" required:"true"`
+	ReadingGroups []string `json:"readingGroups" required:"true"`
+	Description   string   `json:"description"`
+
+	Secret string `json:"secret" required:"true"`
+
 	CreatedAt     string `json:"createdAt"`
 	UpdatedAt     string `json:"updatedAt"`
 	CreatedById   string `json:"createdBy"`
@@ -23,8 +26,9 @@ type SecretEntry struct {
 	UpdatedByName string `json:"updatedByName"`
 }
 
-type GroupEntry struct {
-	Pk      string `json:"pk"`
-	Sk      string `json:"group"`
-	Context string `json:"context"`
+// (Group Id, Group Name)
+type Group struct {
+	Pk   string `json:"pk"`
+	Sk   string `json:"id"`
+	Name string `json:"name"`
 }
