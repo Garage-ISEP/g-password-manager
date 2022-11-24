@@ -20,7 +20,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}))
 
 	// Prepare the item to be added
-	var body models.SecretEntry
+	var body models.Secret
 	if err := utils.ValidateBody(request.Body, &body); err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	// TODO: Remove # from body.Group & Remove # from body.Name
 
-	body.Sk = body.Group + "#" + "4566713-6713136-18393"
+	body.Sk = "4566713-6713136-18393"
 	// body.CreatedById = request.RequestContext.Authorizer["principalId"].(string)
 	// body.CreatedByName = request.RequestContext.Authorizer["name"].(string)
 	body.CreatedAt = time.Now().Format(time.RFC3339)
@@ -53,7 +53,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return nil, err
 	}
 
-	var output models.SecretEntry
+	var output models.Secret
 	if err := dynamodbattribute.UnmarshalMap(item, &output); err != nil {
 		return nil, err
 	}

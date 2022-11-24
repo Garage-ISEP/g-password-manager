@@ -31,7 +31,8 @@ resource "aws_iam_role" "group-sync-role" {
   managed_policy_arns = [
     aws_iam_policy.cognito-admin.arn,
     aws_iam_policy.lambda-logging-policy.arn,
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonCognitoPowerUser"
   ]
 
   tags = local.tags

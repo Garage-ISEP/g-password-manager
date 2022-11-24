@@ -20,12 +20,12 @@ type Request struct {
 }
 
 type Response struct {
-	Items *[]models.SecretEntry `json:"items"`
-	Query *string               `json:"query"`
-	From  *string               `json:"from"`
-	To    *string               `json:"to"`
-	Total *int64                `json:"total"`
-	Count *int64                `json:"count"`
+	Items *[]models.Secret `json:"items"`
+	Query *string          `json:"query"`
+	From  *string          `json:"from"`
+	To    *string          `json:"to"`
+	Total *int64           `json:"total"`
+	Count *int64           `json:"count"`
 }
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (interface{}, error) {
@@ -79,7 +79,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	// Parse response
-	var items []models.SecretEntry = make([]models.SecretEntry, 0)
+	var items []models.Secret = make([]models.Secret, 0)
 	if err := dynamodbattribute.UnmarshalListOfMaps(queryRes.Items, &items); err != nil {
 		return nil, err
 	}

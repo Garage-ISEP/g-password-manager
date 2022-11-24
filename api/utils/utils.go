@@ -11,10 +11,10 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-type Handler func(ctx context.Context, request events.APIGatewayProxyRequest) (interface{}, error)
+type Handler[K any] func(ctx context.Context, request K) (interface{}, error)
 
 // Handle the request, catch all panics and parse response to json with AWS ApiGatewayProxyResponse
-func HandleAWSProxy(handler Handler, ctx context.Context, request events.APIGatewayProxyRequest) *events.APIGatewayProxyResponse {
+func HandleAWSProxy[K any](handler Handler[K], ctx context.Context, request K) *events.APIGatewayProxyResponse {
 
 	// Recover from panic
 	defer func() {
@@ -79,8 +79,8 @@ func validateObject(object interface{}) error {
 	return nil
 }
 
-func LambdaStart(handler Handler) {
-	lambda.Start(func(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+func LambdaStart[K any](handler Handler[K]) {
+	lambda.Start(func(ctx context.Context, request K) (*events.APIGatewayProxyResponse, error) {
 		res := HandleAWSProxy(handler, ctx, request)
 		return res, nil
 	})
