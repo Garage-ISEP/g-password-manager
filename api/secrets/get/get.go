@@ -34,6 +34,8 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
+	fmt.Printf("user info: %v\n", request.RequestContext.Authorizer)
+
 	var queryParams Request
 	if err := utils.ValidateQueryParams(&request.QueryStringParameters, &queryParams); err != nil {
 		return nil, err
