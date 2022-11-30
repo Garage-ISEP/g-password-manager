@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "front" {
-  bucket = "gpass-${var.env}.garageisep.com"
+  bucket = "${var.env != "prod" ? "${var.env}-" : ""}vault.garageisep.com"
 }
 
 resource "aws_s3_bucket_acl" "example_bucket_acl" {
@@ -10,12 +10,10 @@ resource "aws_s3_bucket_acl" "example_bucket_acl" {
 resource "aws_s3_bucket_website_configuration" "front" {
   bucket = aws_s3_bucket.front.bucket
 
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "error.html"
+  routing_rule {
+    redirect {
+      replace_key_with = "index.html"
+    }
   }
 }
 

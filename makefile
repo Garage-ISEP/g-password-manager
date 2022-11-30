@@ -12,6 +12,14 @@ dev: build
 	terraform -chdir=terraform validate
 	terraform -chdir=terraform apply -var env=dev
 
+prod: build
+	cd terraform; cp backend-default.conf backend.conf
+	cd terraform; sed -i 's/ENV/prod/g' backend.conf
+	cd terraform; sed -i 's/STACK/g-password-manager/g' backend.conf
+	terraform -chdir=terraform init -backend-config=backend.conf
+	terraform -chdir=terraform validate
+	terraform -chdir=terraform apply -var env=prod
+
 init:
 	terraform -chdir=terraform init -backend-config=backend.conf
 
