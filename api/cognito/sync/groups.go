@@ -39,7 +39,7 @@ type GoogleUserInfo struct {
 // 	return groups
 // }
 
-func HandleRequest(ctx context.Context, event events.CognitoEventUserPoolsPostAuthentication) (interface{}, error) {
+func HandleRequest(ctx context.Context, event events.CognitoEventUserPoolsPreAuthentication) (interface{}, error) {
 
 	// session := session.Must(session.NewSessionWithOptions(session.Options{
 	// 	SharedConfigState: session.SharedConfigEnable,
